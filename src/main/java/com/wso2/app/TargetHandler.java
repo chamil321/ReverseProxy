@@ -12,15 +12,13 @@ public class TargetHandler extends ChannelInboundHandlerAdapter {
 
     public  TargetHandler(Channel inChannel) {
         this.inChannel = inChannel;
-        System.out.println("init target");
-
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         ctx.read();
         ctx.write(Unpooled.EMPTY_BUFFER);
-        System.out.println("Channel active");
+        System.out.println("Channel active");   //debug print
     }
 
     @Override
@@ -28,7 +26,8 @@ public class TargetHandler extends ChannelInboundHandlerAdapter {
         System.out.println("receive data");
         inChannel.writeAndFlush(msg).addListener(new ChannelFutureListener() {
             @Override
-            public void operationComplete(ChannelFuture future) {
+            public void operationComplete(ChannelFuture future) throws InterruptedException {
+                future.await(1000);
                 if (future.isSuccess()) {
                     ctx.channel().read();
                 } else {

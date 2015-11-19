@@ -15,7 +15,6 @@ public class TransportHandlerInitializer extends ChannelInitializer<SocketChanne
 
     private String host;
     private int port;
-   // private final SslContext sslCtx;
     private int connections;
 
     public TransportHandlerInitializer(String host, int port, int connections) {
@@ -28,9 +27,7 @@ public class TransportHandlerInitializer extends ChannelInitializer<SocketChanne
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
         ChannelPipeline pipeLine = socketChannel.pipeline();
-
-
-        pipeLine.addLast(new HttpServerCodec(102400,102400,102400));
+        pipeLine.addLast(new HttpServerCodec(100000,100000,100000));
         pipeLine.addLast(new SourceHandler(connections));
         pipeLine.addLast(new LoggingHandler(LogLevel.INFO));
 

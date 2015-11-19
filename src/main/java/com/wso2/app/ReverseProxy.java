@@ -3,98 +3,63 @@ package com.wso2.app;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.ssl.SslContext;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 
 /**
  * Created by chamile on 11/16/15.
  */
 public class ReverseProxy {
 
-    public static String Host = null;
-    public static int Host_Port;
+    public static String host = null;
+    public static int hostPort;
 
     private int connections;
-    private boolean is_ssl;
-    private int rev_port;
-    private EventLoopGroup commonEventLoopGroup;
+    private int localport;
+    private EventLoopGroup eventLoopGroup;
 
-
-    //public ReverseProxy(int port) {
-        //this.rev_port = port;
-    //}
 
     public ReverseProxy() {
-        System.out.println("Initial data");
 
+        System.out.println("Initial data");
         //backend address
-        Host = "127.0.0.1";
-        Host_Port = 5000;
+        host = "10.100.4.14";
+        hostPort = 9000;
 
         //Reverse proxy port
-        rev_port = 3031;
-
-        is_ssl = false;
-
-        if (is_ssl){
-            rev_port = 5050;
-        }
-        //bossgroupSize
-
+        localport = 8443;
         connections = 1000;
-        System.out.println("done");
-
-
-
-
     }
 
 
     private void start() {
-        System.out.println("Start server");
 
-        System.out.println("inbound listener port "+ this.rev_port);
-
-        //config ssl
-        //SslContext sslContext = null;
-        //if()
-
+        System.out.println("inbound listening port "+ this.localport);
         // Configure the bootstrap.
-        commonEventLoopGroup = new NioEventLoopGroup(2);
-
+        eventLoopGroup = new NioEventLoopGroup(10);
         try {
-
             ServerBootstrap serverBootstrap = new ServerBootstrap();
-            serverBootstrap.group(commonEventLoopGroup)
+            serverBootstrap.group(eventLoopGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new TransportHandlerInitializer(Host, Host_Port, connections))
+                    .handler(new LoggingHandler(LogLevel.INFO))
+                    .childHandler(new TransportHandlerInitializer(host, hostPort, connections))
                     .childOption(ChannelOption.AUTO_READ, false);
-            //option
 
             Channel channel = null;
             try {
-
-                channel = serverBootstrap.bind(rev_port).sync().channel();
-
+                channel = serverBootstrap.bind(localport).sync().channel();
                 channel.closeFuture().sync();
-
-
-                System.out.println("eubnfqf");
-                System.out.println("inbound listener started");
+                //system.out.println("test");  //debug print
+                System.out.println("Listening");
 
             }catch (InterruptedException e){
                 System.out.println("Exception caught");
             }
         }
         finally {
-            commonEventLoopGroup.shutdownGracefully();
+            eventLoopGroup.shutdownGracefully();
         }
-
-
-
-
-
     }
 
     public static void main(String[] args) {
