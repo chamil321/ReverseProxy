@@ -16,7 +16,6 @@ public class SourceHandler extends ChannelInboundHandlerAdapter {
 
     public SourceHandler(int connections) {
         this.connections = connections;
-
     }
 
     public void channelActive(ChannelHandlerContext context) {
@@ -40,14 +39,11 @@ public class SourceHandler extends ChannelInboundHandlerAdapter {
                     }
                 })
                 .option(ChannelOption.AUTO_READ, false);
-
-
         ChannelFuture channelFuture = bootstrap.connect(ReverseProxy.host, ReverseProxy.hostPort);
         outboundChannel = channelFuture.channel();
         channelFuture.addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(ChannelFuture channelFuture) throws Exception {
-                //channelFuture.await(1000);
                 if (channelFuture.isSuccess()) {
                     inChannel.read();
                     System.out.println("connection complete. start to read SH");

@@ -27,7 +27,6 @@ public class TargetHandler extends ChannelInboundHandlerAdapter {
         inChannel.writeAndFlush(msg).addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(ChannelFuture future) throws InterruptedException {
-                future.await(1000);
                 if (future.isSuccess()) {
                     ctx.channel().read();
                 } else {

@@ -11,7 +11,6 @@ import io.netty.handler.logging.LoggingHandler;
  * Created by chamile on 11/16/15.
  */
 public class ReverseProxy {
-
     public static String host = null;
     public static int hostPort;
 
@@ -29,12 +28,10 @@ public class ReverseProxy {
 
         //Reverse proxy port
         localport = 8443;
-        connections = 1000;
     }
 
 
     private void start() {
-
         System.out.println("inbound listening port "+ this.localport);
         // Configure the bootstrap.
         eventLoopGroup = new NioEventLoopGroup(10);
@@ -60,6 +57,7 @@ public class ReverseProxy {
         finally {
             eventLoopGroup.shutdownGracefully();
         }
+
     }
 
     public static void main(String[] args) {
