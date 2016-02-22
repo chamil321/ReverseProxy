@@ -18,9 +18,7 @@ public class ReverseProxy {
     private int localport;
     private EventLoopGroup eventLoopGroup;
 
-
     public ReverseProxy() {
-
         System.out.println("Initial data");
         //backend address
         host = "10.100.4.14";
@@ -38,16 +36,15 @@ public class ReverseProxy {
         try {
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(eventLoopGroup)
-                    .channel(NioServerSocketChannel.class)
-                    .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(new TransportHandlerInitializer(host, hostPort, connections))
-                    .childOption(ChannelOption.AUTO_READ, false);
+                    .channel(NioServerSocketChannel.class)      //Specify the use of an NIO transport Channel
+                    .handler(new LoggingHandler(LogLevel.INFO)) //logging
+                    .childHandler(new TransportHandlerInitializer(host, hostPort, connections)) //Add an childHandler to the Channel's ChannelPipeline
+                    .childOption(ChannelOption.AUTO_READ, false);   //applies to the channel Configuration
 
             Channel channel = null;
             try {
-                channel = serverBootstrap.bind(localport).sync().channel();
-                channel.closeFuture().sync();
-                //system.out.println("test");  //debug print
+                channel = serverBootstrap.bind(localport).sync().channel();     //Bind the server; sync waits for the server to close
+                channel.closeFuture().sync();   //Close the channel and wait until it is closed
                 System.out.println("Listening");
 
             }catch (InterruptedException e){
@@ -55,13 +52,13 @@ public class ReverseProxy {
             }
         }
         finally {
-            eventLoopGroup.shutdownGracefully();
+            eventLoopGroup.shutdownGracefully();    //Shutdown the EventLoopGroup, which releases all resources.
         }
 
     }
 
     public static void main(String[] args) {
-        ReverseProxy inboundListener = new ReverseProxy();
-        inboundListener.start();
+        ReverseProxy inboundListener = new ReverseProxy();      //create listener instance
+        inboundListener.start();                                //call start method
     }
 }

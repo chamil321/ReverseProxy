@@ -22,12 +22,14 @@ public class TransportHandlerInitializer extends ChannelInitializer<SocketChanne
         this.port = port;
         this.connections = connections;
 
+
     }
 
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
+        System.out.println("2");
         ChannelPipeline pipeLine = socketChannel.pipeline();
-        pipeLine.addLast(new HttpServerCodec(100000,100000,100000));
+        pipeLine.addLast(new HttpServerCodec(102400,102400,102400));
         pipeLine.addLast(new SourceHandler(connections));
         pipeLine.addLast(new LoggingHandler(LogLevel.INFO));
 
